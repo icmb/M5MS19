@@ -17,8 +17,8 @@ for line in sys.stdin:
 	cols = line.split("\t")
 	
 	# produce the key and value
-	key = cols[1] + " " + cols[2]
-	value = cols[0] + " " + cols[3] + " " + cols[4]
+	key = cols[1] + '\t' + cols[2]
+	value = cols[0] + '\t' + cols[3] + '\t' + cols[4]
 	
 	# now output the key and value
-       	print '%s\t%s' % (key, value)
+       	print '%s,%s' % (cols[1], cols[2])
