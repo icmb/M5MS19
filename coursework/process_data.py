@@ -1,4 +1,4 @@
-#!python
+#!/usr/bin/env python
 
 """
     Python program to make copies of a file
@@ -10,24 +10,22 @@
     Intended to process .CSV files, treats file content as text lines.
     
     Anticipated to be run from the command line:
-     python line_drop.py -l <losses> [ in-file [ out-file ... ]]
+     python process_data.py -l <losses> [ in-file [ out-file ... ]]
        -l = the number of lines dropped (defaults to 5)
-
-    Created 01 Feb 2016  by Martin Savidge  for Mark Briers
-     for use in customising .CSV format datasets for course exercises
 """
 
 import sys
 import string
 import getopt
 import random
-
-from sets import Set
+import logging
 
 def main(argv):
+
     """ Process files - everything is done in main() """
 
-    losses = 5 # Number of lines to lose - initialised to default
+    losses = 25 # Number of lines to lose - initialised to default
+    logging.basicConfig(level=logging.INFO)
 
     # Process command line arguments: -h -l in-file out-file ...
     try:
@@ -58,7 +56,7 @@ def main(argv):
 
     # Discover the number of lines in the source file
     try:
-        print('Reading file "{}"...'.format(inputfile))
+	logging.debug("Reading file: %s" % inputfile)
         lines = 0
         with open(inputfile, "r") as inf:
             for line in inf:
@@ -66,13 +64,13 @@ def main(argv):
     except IOError as e:
         print "I/O error({0}): {1}".format(e.errno, e.strerror)
         sys.exit(2)
-    print("Entries found: {}".format(lines))
+    logging.debug("Entries found: %i" % lines)
 
     # Sequence through the output files
     for outputfile in outputfiles:
         
         # Select the line numbers of the lines to be dropped
-        drops = Set()
+        drops = set()
         while len(drops) < losses:
             drops.add(random.randint(0, lines))
 
@@ -80,8 +78,7 @@ def main(argv):
             # Open the source file
             with open(inputfile, "r") as inf:
                 # Create the new file
-                print('Creating file "{}" - dropping lines {}'.\
-                               format(outputfile, sorted(drops)))
+                logging.debug("Creating file %s and dropping lines %s",outputfile,sorted(drops))
                 with open(outputfile, "w") as outf:
                     # Copy non-dropped lines to the new file
                     lineNo = 0
@@ -89,6 +86,7 @@ def main(argv):
                         lineNo += 1
                         if lineNo not in drops:
                             outf.write(line)
+                logging.info("File %s successfully created.",outputfile)
         except IOError as e:
             print "I/O error({0}): {1}".format(e.errno, e.strerror)
     # end for outputfile in outputfiles:
